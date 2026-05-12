@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model WorkflowTemplate {
+  id          String   @id
+  name        String
+  category    String
+  description String
+  duration    String
+  favorite    Boolean  @default(false)
+  status      String   @default("draft")
+  custom      Boolean  @default(true)
+  fieldsJson  String   @default("[]")
+  nodesJson   String   @default("[]")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workflows WorkflowInstance[]
+}
+
+model WorkflowInstance {
+  id          String   @id
+  no          String   @unique
+  templateId  String
+  title       String
+  category    String
+  status      String   @default("pending")
+  initiator   String
+  department  String
+  currentNode String
+  owner       String
+  amount      String   @default("-")
+  vendor      String   @default("-")
+  purpose     String   @default("-")
+  startedAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  stuckHours  Int      @default(0)
+  summaryJson String   @default("[]")
+  dataJson    String   @default("{}")
+
+  template WorkflowTemplate @relation(fields: [templateId], references: [id])
+  nodes    WorkflowNode[]
+  logs     AuditLog[]
+}
+
+model WorkflowNode {
+  id             String   @id
+  workflowId     String
+  templateNodeId String
+  order          Int
+  name           String
+  type           String
+  status         String
+  assignee       String
+  approver       String   @default("")
+  cc             String   @default("")
+  time           String   @default("未开始")
+  dwell          String   @default("-")
+  summaryJson    String   @default("[]")
+  detailsJson    String   @default("[]")
+  editable       Boolean  @default(false)
+  opinion        String   @default("")
+  attachmentsJson String @default("[]")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  workflow WorkflowInstance @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  logs     AuditLog[]
+}
+
+model AuditLog {
+  id           String   @id
+  workflowId   String
+  nodeId       String?
+  actor        String
+  action       String
+  opinion      String   @default("")
+  metadataJson String   @default("{}")
+  createdAt    DateTime @default(now())
+
+  workflow WorkflowInstance @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  node     WorkflowNode?    @relation(fields: [nodeId], references: [id], onDelete: SetNull)
+}
+
+model Notification {
+  id           String   @id
+  workflowId   String?
+  nodeId       String?
+  targetUser   String
+  title        String
+  content      String
+  link         String
+  channel      String   @default("wecom")
+  status       String   @default("queued")
+  errorMessage String   @default("")
+  createdAt    DateTime @default(now())
+  sentAt       DateTime?
+}

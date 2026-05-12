@@ -1,0 +1,42 @@
+{
+  "name": "company-oa-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NestJS backend for the Enterprise WeCom OA workflow system.",
+  "scripts": {
+    "build": "nest build",
+    "dev": "nest start --watch",
+    "start": "node dist/main.js",
+    "prisma:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:init": "sqlite3 prisma/dev.db < prisma/init.sql",
+    "db:seed": "tsx prisma/seed.ts",
+    "setup": "npm run prisma:generate && npm run db:init && npm run db:seed"
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.4.15",
+    "@nestjs/config": "^3.3.0",
+    "@nestjs/core": "^10.4.15",
+    "@nestjs/platform-express": "^10.4.15",
+    "@nestjs/swagger": "^8.1.0",
+    "@prisma/client": "^6.1.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.4.8",
+    "@nestjs/schematics": "^10.2.3",
+    "@nestjs/testing": "^10.4.15",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "prisma": "^6.1.0",
+    "source-map-support": "^0.5.21",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
+}
