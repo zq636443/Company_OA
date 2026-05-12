@@ -19,7 +19,8 @@ interface RequestOptions extends RequestInit {
 }
 
 function buildUrl(path: string, query?: RequestOptions['query']) {
-  const url = new URL(`${API_BASE_URL}${path}`)
+  const origin = typeof window === 'undefined' ? 'http://localhost' : window.location.origin
+  const url = new URL(`${API_BASE_URL}${path}`, origin)
   Object.entries(query ?? {}).forEach(([key, value]) => {
     if (value !== undefined) url.searchParams.set(key, String(value))
   })
