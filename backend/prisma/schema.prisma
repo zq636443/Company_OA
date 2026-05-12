@@ -3,21 +3,21 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 model WorkflowTemplate {
-  id          String   @id
-  name        String
-  category    String
-  description String
-  duration    String
+  id          String   @id @db.VarChar(64)
+  name        String   @db.VarChar(120)
+  category    String   @db.VarChar(64)
+  description String   @db.Text
+  duration    String   @db.VarChar(64)
   favorite    Boolean  @default(false)
-  status      String   @default("draft")
+  status      String   @default("draft") @db.VarChar(32)
   custom      Boolean  @default(true)
-  fieldsJson  String   @default("[]")
-  nodesJson   String   @default("[]")
+  fieldsJson  String   @db.LongText
+  nodesJson   String   @db.LongText
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -25,24 +25,24 @@ model WorkflowTemplate {
 }
 
 model WorkflowInstance {
-  id          String   @id
-  no          String   @unique
-  templateId  String
-  title       String
-  category    String
-  status      String   @default("pending")
-  initiator   String
-  department  String
-  currentNode String
-  owner       String
-  amount      String   @default("-")
-  vendor      String   @default("-")
-  purpose     String   @default("-")
+  id          String   @id @db.VarChar(64)
+  no          String   @unique @db.VarChar(64)
+  templateId  String   @db.VarChar(64)
+  title       String   @db.VarChar(160)
+  category    String   @db.VarChar(64)
+  status      String   @default("pending") @db.VarChar(32)
+  initiator   String   @db.VarChar(120)
+  department  String   @db.VarChar(120)
+  currentNode String   @db.VarChar(120)
+  owner       String   @db.VarChar(120)
+  amount      String   @default("-") @db.VarChar(64)
+  vendor      String   @default("-") @db.VarChar(160)
+  purpose     String   @default("-") @db.VarChar(500)
   startedAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   stuckHours  Int      @default(0)
-  summaryJson String   @default("[]")
-  dataJson    String   @default("{}")
+  summaryJson String   @db.LongText
+  dataJson    String   @db.LongText
 
   template WorkflowTemplate @relation(fields: [templateId], references: [id])
   nodes    WorkflowNode[]
@@ -50,38 +50,38 @@ model WorkflowInstance {
 }
 
 model WorkflowNode {
-  id             String   @id
-  workflowId     String
-  templateNodeId String
-  order          Int
-  name           String
-  type           String
-  status         String
-  assignee       String
-  approver       String   @default("")
-  cc             String   @default("")
-  time           String   @default("未开始")
-  dwell          String   @default("-")
-  summaryJson    String   @default("[]")
-  detailsJson    String   @default("[]")
-  editable       Boolean  @default(false)
-  opinion        String   @default("")
-  attachmentsJson String @default("[]")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id              String   @id @db.VarChar(64)
+  workflowId      String   @db.VarChar(64)
+  templateNodeId  String   @db.VarChar(64)
+  order           Int
+  name            String   @db.VarChar(120)
+  type            String   @db.VarChar(32)
+  status          String   @db.VarChar(32)
+  assignee        String   @db.VarChar(120)
+  approver        String   @default("") @db.VarChar(120)
+  cc              String   @default("") @db.VarChar(255)
+  time            String   @default("未开始") @db.VarChar(64)
+  dwell           String   @default("-") @db.VarChar(64)
+  summaryJson     String   @db.LongText
+  detailsJson     String   @db.LongText
+  editable        Boolean  @default(false)
+  opinion         String   @db.Text
+  attachmentsJson String   @db.LongText
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   workflow WorkflowInstance @relation(fields: [workflowId], references: [id], onDelete: Cascade)
   logs     AuditLog[]
 }
 
 model AuditLog {
-  id           String   @id
-  workflowId   String
-  nodeId       String?
-  actor        String
-  action       String
-  opinion      String   @default("")
-  metadataJson String   @default("{}")
+  id           String   @id @db.VarChar(64)
+  workflowId   String   @db.VarChar(64)
+  nodeId       String?  @db.VarChar(64)
+  actor        String   @db.VarChar(120)
+  action       String   @db.VarChar(32)
+  opinion      String   @db.Text
+  metadataJson String   @db.LongText
   createdAt    DateTime @default(now())
 
   workflow WorkflowInstance @relation(fields: [workflowId], references: [id], onDelete: Cascade)
@@ -89,16 +89,16 @@ model AuditLog {
 }
 
 model Notification {
-  id           String   @id
-  workflowId   String?
-  nodeId       String?
-  targetUser   String
-  title        String
-  content      String
-  link         String
-  channel      String   @default("wecom")
-  status       String   @default("queued")
-  errorMessage String   @default("")
-  createdAt    DateTime @default(now())
+  id           String    @id @db.VarChar(64)
+  workflowId   String?   @db.VarChar(64)
+  nodeId       String?   @db.VarChar(64)
+  targetUser   String    @db.VarChar(120)
+  title        String    @db.VarChar(160)
+  content      String    @db.Text
+  link         String    @db.VarChar(512)
+  channel      String    @default("wecom") @db.VarChar(32)
+  status       String    @default("queued") @db.VarChar(32)
+  errorMessage String    @default("") @db.VarChar(1000)
+  createdAt    DateTime  @default(now())
   sentAt       DateTime?
 }

@@ -32,4 +32,10 @@ http://127.0.0.1:3001/docs
 - `wecom`: enterprise WeChat config placeholder
 - `ai`: AI provider placeholder for future template generation, summaries, risk checks
 
-Local development uses SQLite to keep the project runnable without extra services. The `setup` script initializes SQLite tables with `prisma/init.sql` and then seeds data through Prisma Client. Production should switch Prisma datasource to PostgreSQL and use Prisma migrations plus Redis-backed queues for notifications and AI jobs.
+The backend uses MySQL through Prisma. Start a local MySQL instance first, or from the repository root run:
+
+```bash
+docker compose up -d mysql
+```
+
+Then set `DATABASE_URL` in `backend/.env`. The `setup` script runs Prisma Client generation, pushes the schema to MySQL, and seeds demo data.

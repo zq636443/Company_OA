@@ -10,9 +10,6 @@ frontend/dist
 backend/dist
 
 backend/.env
-backend/prisma/dev.db
-backend/prisma/*.db
-backend/prisma/*.db-journal
 
 *.log
 *.tsbuildinfo
